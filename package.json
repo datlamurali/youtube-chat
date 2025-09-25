@@ -1,0 +1,32 @@
+{
+  "name": "video-chat-app",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "framer-motion": "^10.12.16",
+    "lucide-react": "^0.263.0",
+    "openai": "^5.23.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "react-swipeable": "^7.0.2",
+    "react-youtube": "^10.1.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
