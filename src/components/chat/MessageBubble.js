@@ -17,19 +17,17 @@ export default function MessageBubble({ message }) {
           <Aperture className="w-5 h-5 text-white" />
         </div>
       )}
-
-      <div className="bg-slate-950 text-slate-800 px-4 py-2 rounded-2xl shadow-sm border border-slate-100 rounded-bl-md flex items-center max-w-[80%] overflow-hidden">
-        <p className="text-slate-300 text-sm truncate">
-          {text}
-        </p>
-        <span className="ml-3 text-xs text-slate-400 flex-shrink-0">
-          {timestamp.toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit'
-          })}
-        </span>
-      </div>
-
+        <div className="bg-slate-950 text-slate-800 px-4 py-2 rounded-2xl shadow-sm border border-slate-100 rounded-bl-md flex items-center max-w-[90%]">
+          <p className="text-slate-300 text-sm whitespace-pre-wrap break-words w-full">
+            {text}
+            <span className="ml-2 text-xs text-slate-400">
+              {timestamp.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
+            </span>
+          </p>
+        </div>
       {!isAi && (
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center flex-shrink-0 shadow-sm">
           <User className="w-4 h-4 text-white" />
