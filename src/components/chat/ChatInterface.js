@@ -1,11 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Send, Loader2, XCircle } from "lucide-react";
+import { Send, Loader2, XCircle, Mic, ArrowRight } from "lucide-react";
 import { InvokeLLM } from "../../integrations/Core";
 import MessageBubble from "./MessageBubble";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 
 export default function ChatInterface({ messages, onSendMessage, onClose }) {
   const [inputText, setInputText] = useState("");
@@ -39,7 +38,7 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
       onSendMessage("I'm sorry, I encountered an error. Please try again!", true);
     } finally {
       setIsLoading(false);
-      inputRef.current?.focus(); // Refocus input
+      inputRef.current?.focus();
     }
   };
 
@@ -50,9 +49,34 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
     }
   };
 
+  const handleVoiceInput = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Speech recognition is not supported in this browser.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setInputText(transcript);
+      inputRef.current?.focus();
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error:", event.error);
+    };
+
+    recognition.start();
+  };
+
   return (
     <div className="h-full w-full bg-black border-t border-slate-200/50">
-      {/* Stylish Close Button */}
+      {/* Close Button */}
       <div className="absolute top-2 right-4 z-[10000]">
         <Button
           variant="ghost"
@@ -100,6 +124,18 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
               disabled={isLoading}
             />
           </div>
+
+          {/* Mic Button */}
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              onClick={handleVoiceInput}
+              className="bg-slate-800 hover:bg-slate-700 text-white rounded-2xl px-3 py-3 h-12"
+            >
+              <Mic className="w-4 h-4" />
+            </Button>
+          </motion.div>
+
+          {/* Send Button */}
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
               onClick={handleSend}
