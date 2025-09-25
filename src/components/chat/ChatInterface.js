@@ -16,6 +16,8 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+
+  
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
