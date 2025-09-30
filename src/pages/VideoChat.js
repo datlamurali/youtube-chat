@@ -27,13 +27,13 @@ export default function VideoChat() {
 
   return (
     <div className="h-screen w-screen flex flex-col bg-black overflow-hidden">
-      {/* Video Player - 80% */}
-      <div className="h-[80vh]">
+      {/* Video Player - fills remaining space above chat */}
+      <div className="flex-1 min-h-0">
         <VideoPlayer videoUrl={videoUrl} onVideoChange={setVideoUrl} />
       </div>
 
-      {/* Bottom 20% - Tap to reveal chat */}
-      <div className="h-[20vh] relative">
+      {/* Chat Interface - fixed to 49.6mm (~187.5px) */}
+      <div className="relative" style={{ height: "187.5px" }}>
         {!chatVisible ? (
           <div
             className="h-full w-full bg-black flex items-center justify-center text-white text-sm cursor-pointer"
@@ -49,5 +49,6 @@ export default function VideoChat() {
         )}
       </div>
     </div>
+
   );
 }
