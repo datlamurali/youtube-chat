@@ -11,11 +11,11 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const [isMicActive, setIsMicActive] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-
 
   
   useEffect(() => {
@@ -63,18 +63,27 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
     recognition.interimResults = false;
     recognition.lang = "en-US";
 
+    setIsMicActive(true); // 🔴 Activate mic
+
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       setInputText(transcript);
       inputRef.current?.focus();
+      setIsMicActive(false); // ⚪️ Deactivate mic
     };
 
     recognition.onerror = (event) => {
       console.error("Speech recognition error:", event.error);
+      setIsMicActive(false); // ⚪️ Deactivate mic
+    };
+
+    recognition.onend = () => {
+      setIsMicActive(false); // ⚪️ Deactivate mic
     };
 
     recognition.start();
   };
+
 
   return (
     <div className="h-full w-full bg-black border-t border-slate-200/50">
@@ -131,11 +140,14 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
               onClick={handleVoiceInput}
-              className="bg-slate-800 hover:bg-slate-700 text-white rounded-2xl px-3 py-3 h-12"
+              className={`rounded-2xl px-3 py-3 h-12 ${
+                isMicActive ? "bg-red-600 hover:bg-red-500" : "bg-slate-800 hover:bg-slate-700"
+              } text-white`}
             >
               <Mic className="w-4 h-4" />
             </Button>
           </motion.div>
+
 
           {/* Send Button */}
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
