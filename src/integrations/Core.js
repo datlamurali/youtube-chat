@@ -14,6 +14,7 @@ export async function InvokeLLM({ prompt }) {
       return `Server error (${response.status}): ${errorText}`;
     }
 
+    
     const data = await response.json();
     return data.reply;
   } catch (error) {
