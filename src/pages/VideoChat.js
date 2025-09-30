@@ -49,7 +49,6 @@ export default function VideoChat() {
             className="h-full w-full bg-black flex items-center justify-center text-white text-sm cursor-pointer"
             onClick={() => setChatVisible(true)}
           >
-            Tap to chat
           </div>
         ) : (
           <ChatInterface
