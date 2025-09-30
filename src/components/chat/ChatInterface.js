@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Send, Loader2, XCircle, Mic, ArrowRight } from "lucide-react";
+import { Loader2, XCircle, Mic, ArrowRight } from "lucide-react";
 import { InvokeLLM } from "../../integrations/Core";
 import MessageBubble from "./MessageBubble";
 import { motion } from "framer-motion";
@@ -9,15 +9,14 @@ import { motion } from "framer-motion";
 export default function ChatInterface({ messages, onSendMessage, onClose }) {
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isMicActive, setIsMicActive] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
-  const [isMicActive, setIsMicActive] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -63,30 +62,23 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
     recognition.interimResults = false;
     recognition.lang = "en-US";
 
-    setIsMicActive(true); // 🔴 Activate mic
+    setIsMicActive(true);
 
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       setInputText(transcript);
       inputRef.current?.focus();
-      setIsMicActive(false); // ⚪️ Deactivate mic
+      setIsMicActive(false);
     };
 
-    recognition.onerror = (event) => {
-      console.error("Speech recognition error:", event.error);
-      setIsMicActive(false); // ⚪️ Deactivate mic
-    };
-
-    recognition.onend = () => {
-      setIsMicActive(false); // ⚪️ Deactivate mic
-    };
+    recognition.onerror = () => setIsMicActive(false);
+    recognition.onend = () => setIsMicActive(false);
 
     recognition.start();
   };
 
-
   return (
-    <div className="h-full w-full bg-black border-t border-slate-200/50">
+    <div className="h-full w-full bg-black border-t border-slate-200/50 flex flex-col">
       {/* Close Button */}
       <div className="absolute top-2 right-4 z-[10000]">
         <Button
@@ -99,7 +91,7 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
       </div>
 
       {/* Chat History */}
-      <div className="h-[calc(20vh-64px)] overflow-y-auto px-4 pt-8 pb-2 space-y-3">
+      <div className="flex-1 overflow-y-auto px-4 pt-8 pb-2 space-y-3">
         {messages.map((message) => (
           <MessageBubble key={message.id} message={message} />
         ))}
@@ -122,7 +114,7 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
       </div>
 
       {/* Input Area */}
-      <div className="absolute bottom-0 left-0 right-0 bg-slate-950 p-4 z-[10000]">
+      <div className="bg-slate-950 p-4 z-[10000]">
         <div className="flex gap-3 items-end w-full max-w-full box-border">
           <div className="flex-1">
             <Input
@@ -147,7 +139,6 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
               <Mic className="w-4 h-4" />
             </Button>
           </motion.div>
-
 
           {/* Send Button */}
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>

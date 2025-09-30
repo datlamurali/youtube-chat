@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import VideoPlayer from "../components/video/VideoPlayer";
 import ChatInterface from "../components/chat/ChatInterface";
 
@@ -14,6 +14,13 @@ export default function VideoChat() {
 
   const [videoUrl, setVideoUrl] = useState("https://youtu.be/6pxRHBw-k8M");
   const [chatVisible, setChatVisible] = useState(false);
+  const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
+
+  useEffect(() => {
+    const handleResize = () => setViewportHeight(window.innerHeight);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const addMessage = (text, isAi = false) => {
     const newMessage = {
@@ -26,7 +33,10 @@ export default function VideoChat() {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-black overflow-hidden">
+    <div
+      className="w-screen flex flex-col bg-black overflow-hidden"
+      style={{ height: `${viewportHeight}px` }}
+    >
       {/* Video Player - fills remaining space above chat */}
       <div className="flex-1 min-h-0">
         <VideoPlayer videoUrl={videoUrl} onVideoChange={setVideoUrl} />
@@ -39,6 +49,7 @@ export default function VideoChat() {
             className="h-full w-full bg-black flex items-center justify-center text-white text-sm cursor-pointer"
             onClick={() => setChatVisible(true)}
           >
+            Tap to chat
           </div>
         ) : (
           <ChatInterface
@@ -49,6 +60,5 @@ export default function VideoChat() {
         )}
       </div>
     </div>
-
   );
 }
