@@ -67,9 +67,9 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       setInputText(transcript);
-      inputRef.current?.focus();
       setIsMicActive(false);
     };
+
 
     recognition.onerror = () => setIsMicActive(false);
     recognition.onend = () => setIsMicActive(false);
