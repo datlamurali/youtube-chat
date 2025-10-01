@@ -12,7 +12,7 @@ export default function VideoChat() {
     }
   ]);
 
-  const [videoUrl, setVideoUrl] = useState("https://youtu.be/6pxRHBw-k8M");
+  const [videoUrl, setVideoUrl] = useState("https://youtu.be/F0QyPFRKllQ");
   const [chatVisible, setChatVisible] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
 
