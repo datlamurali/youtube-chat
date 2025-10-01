@@ -22,7 +22,7 @@ export default function VideoPlayer({ videoUrl, onVideoChange }) {
     }
   };
 
-  const videoId = extractVideoId(videoUrl) || "6pxRHBw-k8M";
+  const videoId = extractVideoId(videoUrl) || "F0QyPFRKllQ";
 
   const handleUrlSubmit = () => {
     if (tempUrl.trim()) {
