@@ -1,5 +1,4 @@
 const backendURL = process.env.REACT_APP_BACKEND_URL;
-console.log("Backend URL:", backendURL);
 export async function InvokeLLM({ prompt }) {
   try {
     const response = await fetch(`${backendURL}/api/invoke-llm`, {
@@ -14,7 +13,7 @@ export async function InvokeLLM({ prompt }) {
       return `Server error (${response.status}): ${errorText}`;
     }
 
-    
+
     const data = await response.json();
     return data.reply;
   } catch (error) {

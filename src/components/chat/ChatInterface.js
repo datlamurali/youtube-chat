@@ -5,6 +5,7 @@ import { Loader2, XCircle, Mic, ArrowRight } from "lucide-react";
 import { InvokeLLM } from "../../integrations/Core";
 import MessageBubble from "./MessageBubble";
 import { motion } from "framer-motion";
+import { useGlobalSettings } from "../../contexts/GlobalSettingsContext";
 
 export default function ChatInterface({ messages, onSendMessage, onClose }) {
   const [inputText, setInputText] = useState("");
@@ -12,6 +13,7 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
   const [isMicActive, setIsMicActive] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const { textboxColor } = useGlobalSettings();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -70,17 +72,22 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
       setIsMicActive(false);
     };
 
-
     recognition.onerror = () => setIsMicActive(false);
     recognition.onend = () => setIsMicActive(false);
 
     recognition.start();
   };
 
+  const safeColor = {
+    border: textboxColor?.border || "#FFFFFF",
+    background: textboxColor?.background || "#000000",
+    font: textboxColor?.font || "#FFFFFF"
+  };
+
   return (
-    <div className="h-full w-full bg-black border-t border-slate-200/50 flex flex-col">
+    <div className="h-full w-full bg-black border-t border-slate-200/50 flex flex-col relative">
       {/* Close Button */}
-      <div className="absolute top-2 right-4 z-[10000]">
+      <div className="absolute top-2 right-4 z-50">
         <Button
           variant="ghost"
           onClick={onClose}
@@ -114,19 +121,24 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
       </div>
 
       {/* Input Area */}
-      <div className="bg-slate-950 p-4 z-[10000]">
+      <div className="bg-slate-950 p-4 z-40">
         <div className="flex gap-3 items-end w-full max-w-full box-border">
-          <div className="flex-1">
+          <motion.div layout className="flex-1">
             <Input
               ref={inputRef}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Ask me anything..."
-              className="bg-orange-500 placeholder-orange-100 text-white px-4 py-3 text-base h-12 w-full border border-orange-300 focus:border-orange-400 rounded-2xl resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
+              style={{
+                border: `2px solid ${safeColor.border}`,
+                backgroundColor: safeColor.background,
+                color: safeColor.font
+              }}
+              className={`px-4 py-3 text-base h-12 w-full rounded-2xl resize-none focus:outline-none placeholder-opacity-100`}
               disabled={isLoading}
             />
-          </div>
+          </motion.div>
 
           {/* Mic Button */}
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>

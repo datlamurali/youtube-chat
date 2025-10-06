@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import VideoPlayer from "../components/video/VideoPlayer";
 import ChatInterface from "../components/chat/ChatInterface";
+import { useGlobalSettings } from "../contexts/GlobalSettingsContext";
 
 export default function VideoChat() {
   const [messages, setMessages] = useState([
@@ -15,6 +16,7 @@ export default function VideoChat() {
   const [videoUrl, setVideoUrl] = useState("https://youtu.be/F0QyPFRKllQ");
   const [chatVisible, setChatVisible] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
+  const { aiPanelHeight } = useGlobalSettings();
 
   useEffect(() => {
     const handleResize = () => setViewportHeight(window.innerHeight);
@@ -32,23 +34,24 @@ export default function VideoChat() {
     setMessages(prev => [...prev, newMessage]);
   };
 
+  const panelHeight = aiPanelHeight || "187.50px";
+  const videoHeight = `${viewportHeight - parseFloat(panelHeight)}px`;
+
   return (
-    <div
-      className="w-screen flex flex-col bg-black overflow-hidden"
-      style={{ height: `${viewportHeight}px` }}
-    >
-      {/* Video Player - fills remaining space above chat */}
-      <div className="flex-1 min-h-0">
+    <div className="w-screen flex flex-col bg-black overflow-hidden" style={{ height: `${viewportHeight}px` }}>
+      {/* Video Player fills remaining space above chat */}
+      <div style={{ height: videoHeight }}>
         <VideoPlayer videoUrl={videoUrl} onVideoChange={setVideoUrl} />
       </div>
 
-      {/* Chat Interface - fixed to 49.6mm (~187.5px) */}
-      <div className="relative" style={{ height: "187.5px" }}>
+      {/* Chat Panel */}
+      <div className="relative" style={{ height: panelHeight }}>
         {!chatVisible ? (
           <div
             className="h-full w-full bg-black flex items-center justify-center text-white text-sm cursor-pointer"
             onClick={() => setChatVisible(true)}
           >
+            <span></span>
           </div>
         ) : (
           <ChatInterface
