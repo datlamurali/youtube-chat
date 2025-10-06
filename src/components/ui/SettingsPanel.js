@@ -48,7 +48,7 @@ export default function SettingsPanel({
         ref={settingsRef}
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-slate-800 text-white rounded-xl p-6 w-full max-w-3xl max-h-[80vh] overflow-y-auto space-y-6 shadow-xl"
+        className="bg-slate-800 text-white rounded-xl p-6 w-[90vw] max-w-[90vw] max-h-[80vh] overflow-y-auto space-y-6 shadow-xl"
       >
         <div className="flex items-center justify-between">
           <div className="text-lg font-semibold">Settings</div>
