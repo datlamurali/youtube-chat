@@ -123,7 +123,7 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
               onChange={(e) => setInputText(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Ask me anything..."
-              className="bg-slate-950 text-slate-50 px-4 py-3 text-base h-12 w-full border border-slate-200 focus:border-blue-400 rounded-2xl resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="bg-orange-500 placeholder-orange-100 text-white px-4 py-3 text-base h-12 w-full border border-orange-300 focus:border-orange-400 rounded-2xl resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
               disabled={isLoading}
             />
           </div>
