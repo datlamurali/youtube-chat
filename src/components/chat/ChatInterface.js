@@ -86,16 +86,27 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
 
   return (
     <div className="h-full w-full bg-black border-t border-slate-200/50 flex flex-col relative">
-      {/* Close Button */}
-      <div className="absolute top-2 right-4 z-50">
+      {/* Close + Mic Buttons */}
+      <div className="absolute top-2 right-4 z-50 flex flex-col items-center gap-3">
         <Button
           variant="ghost"
           onClick={onClose}
-          className="text-white hover:text-red-400 p-2 rounded-full border border-white/20 shadow-md backdrop-blur-sm"
+          className="text-white hover:text-red-400 p-3 rounded-full border border-white/20 shadow-md backdrop-blur-sm"
         >
-          <XCircle className="w-5 h-5" />
+          <XCircle className="w-6 h-6" />
+        </Button>
+
+        <Button
+          onClick={handleVoiceInput}
+          className={`p-3 rounded-full shadow-md ${
+            isMicActive ? "bg-red-600 hover:bg-red-500" : "bg-slate-800 hover:bg-slate-700"
+          } text-white`}
+          title="Voice Input"
+        >
+          <Mic className="w-6 h-6" />
         </Button>
       </div>
+
 
       {/* Chat History */}
       <div className="flex-1 overflow-y-auto px-4 pt-8 pb-2 space-y-3">
@@ -140,17 +151,7 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
             />
           </motion.div>
 
-          {/* Mic Button */}
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              onClick={handleVoiceInput}
-              className={`rounded-2xl px-3 py-3 h-12 ${
-                isMicActive ? "bg-red-600 hover:bg-red-500" : "bg-slate-800 hover:bg-slate-700"
-              } text-white`}
-            >
-              <Mic className="w-4 h-4" />
-            </Button>
-          </motion.div>
+
 
           {/* Send Button */}
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
