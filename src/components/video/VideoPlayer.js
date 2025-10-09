@@ -107,8 +107,21 @@ export default function VideoPlayer({ videoUrl, onVideoChange }) {
             videoId={finalVideoId}
             className="w-full h-full"
             iframeClassName="w-full h-full"
-            opts={{ width: "100%", height: "100%" }}
+            opts={{
+              width: "100%",
+              height: "100%",
+              playerVars: {
+                autoplay: 1,
+                controls: 0,
+                modestbranding: 1,
+                rel: 0,
+                disablekb: 1,
+                fs: 0,
+                iv_load_policy: 3
+              }
+            }}
           />
+
         ) : (
           <div className="flex items-center justify-center w-full h-full text-white">
             <Play className="w-16 h-16 opacity-50" />
