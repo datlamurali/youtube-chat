@@ -80,33 +80,38 @@ export default function VideoPlayer({ videoUrl, onVideoChange }) {
   return (
     <div className="relative w-full h-full bg-slate-900 overflow-hidden">
       {/* Video or Fallback */}
-      <div
-        className="w-full h-full"
-        onContextMenu={(e) => e.preventDefault()} // ✅ Prevent long-press menu
-      >
+      <div className="relative w-full h-full" onContextMenu={(e) => e.preventDefault()}>
         {finalVideoId ? (
-          <YouTube
-            videoId={finalVideoId}
-            className="w-full h-full"
-            iframeClassName="w-full h-full"
-            opts={{
-              width: "100%",
-              height: "100%",
-              playerVars: {
-                autoplay: 1,
-                controls: 0,
-                modestbranding: 1,
-                rel: 0,
-                disablekb: 1,
-                fs: 0,
-                iv_load_policy: 3
-              }
-            }}
-            onReady={(event) => {
-              event.target.mute();
-              event.target.playVideo();
-            }}
-          />
+          <>
+            <YouTube
+              videoId={finalVideoId}
+              className="w-full h-full"
+              iframeClassName="w-full h-full"
+              opts={{
+                width: "100%",
+                height: "100%",
+                playerVars: {
+                  autoplay: 1,
+                  controls: 0,
+                  modestbranding: 1,
+                  rel: 0,
+                  disablekb: 1,
+                  fs: 0,
+                  iv_load_policy: 3
+                }
+              }}
+              onReady={(event) => {
+                event.target.mute();
+                event.target.playVideo();
+              }}
+            />
+            {/* Transparent overlay to suppress long-press */}
+            <div
+              className="absolute top-0 left-0 w-full h-full"
+              onTouchStart={(e) => e.preventDefault()}
+              onContextMenu={(e) => e.preventDefault()}
+            />
+          </>
         ) : (
           <div className="flex items-center justify-center w-full h-full text-white">
             <Play className="w-16 h-16 opacity-50" />
