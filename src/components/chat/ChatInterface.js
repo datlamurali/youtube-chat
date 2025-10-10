@@ -23,17 +23,18 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!inputText.trim() || isLoading) return;
+  // ✅ Updated to accept optional overrideText
+  const handleSend = async (overrideText) => {
+    const message = overrideText ?? inputText.trim();
+    if (!message || isLoading) return;
 
-    const userMessage = inputText.trim();
     setInputText("");
-    onSendMessage(userMessage, false);
+    onSendMessage(message, false);
     setIsLoading(true);
 
     try {
       const response = await InvokeLLM({
-        prompt: `You are ChatGPT, a large language model by OpenAI. You are having a friendly and helpful conversation with a user who is watching a YouTube video. Keep your responses concise and engaging. User's message: "${userMessage}"`
+        prompt: `You are ChatGPT, a large language model by OpenAI. You are having a friendly and helpful conversation with a user who is watching a YouTube video. Keep your responses concise and engaging. User's message: "${message}"`
       });
 
       onSendMessage(response, true);
@@ -52,6 +53,7 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
     }
   };
 
+    // ✅ Updated to pass transcript directly to handleSend
   const handleVoiceInput = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -70,6 +72,11 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
       const transcript = event.results[0][0].transcript;
       setInputText(transcript);
       setIsMicActive(false);
+
+      // ✅ Delay sending by 5 seconds
+      setTimeout(() => {
+        handleSend(transcript);
+      }, 2500);
     };
 
     recognition.onerror = () => setIsMicActive(false);
@@ -77,6 +84,8 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
 
     recognition.start();
   };
+
+
 
   const safeColor = {
     border: textboxColor?.border || "#FFFFFF",
@@ -107,7 +116,6 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
         </Button>
       </div>
 
-
       {/* Chat History */}
       <div className="flex-1 overflow-y-auto px-4 pt-8 pb-2 space-y-3">
         {messages.map((message) => (
@@ -123,7 +131,7 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
             <div className="bg-slate-100 rounded-2xl rounded-bl-md px-4 py-3 max-w-xs">
               <div className="flex items-center gap-2 text-slate-600">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-sm">ChatGPT is thinking...</span>
+                  <span className="text-sm">SmartChat is processing your request...</span>
               </div>
             </div>
           </motion.div>
@@ -151,12 +159,10 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
             />
           </motion.div>
 
-
-
           {/* Send Button */}
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
-              onClick={handleSend}
+              onClick={() => handleSend()}
               disabled={!inputText.trim() || isLoading}
               className="bg-blue-600 hover:bg-blue-700 text-white rounded-2xl px-4 py-3 h-12"
             >

@@ -1,10 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import YouTube from "react-youtube";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Play, Settings, XCircle, RefreshCcw, Eye } from "lucide-react";
-import { motion } from "framer-motion";
-import { SketchPicker } from "react-color";
+import { Play, Settings } from "lucide-react";
 import { useGlobalSettings } from "../../contexts/GlobalSettingsContext";
 import SettingsPanel from "../ui/SettingsPanel";
 
@@ -16,14 +13,15 @@ export default function VideoPlayer({ videoUrl, onVideoChange }) {
 
   const {
     aiPanelHeight,
-    setAiPanelHeight,
     textboxColor,
-    setTextboxColor,
     pendingColor,
-    setPendingColor,
     colorPresets,
+    setTextboxColor,
+    setPendingColor,
     setColorPresets,
-    resetSettings
+    setAiPanelHeight,
+    resetSettings,
+    setUserPresets
   } = useGlobalSettings();
 
   const extractVideoId = (url) => {
@@ -49,8 +47,6 @@ export default function VideoPlayer({ videoUrl, onVideoChange }) {
     }
   };
 
-  const { setUserPresets } = useGlobalSettings();
-
   const savePreset = () => {
     const normalize = (hex) => hex.toUpperCase();
     const normalizedPreset = {
@@ -60,23 +56,6 @@ export default function VideoPlayer({ videoUrl, onVideoChange }) {
     };
     setUserPresets((prev) => [...prev, normalizedPreset]);
   };
-
-  {colorPresets.map((preset, i) => (
-    <button
-      key={i}
-      onClick={() => applyPreset(preset)}
-      className="w-10 h-10 rounded-full border-2"
-      style={{
-        backgroundColor: preset.background,
-        borderColor: preset.border,
-        color: preset.font
-      }}
-      title={preset.name || `Preset ${i + 1}`}
-    >
-      A
-    </button>
-  ))}
-
 
   const applyPreset = (preset) => {
     setPendingColor(preset);
@@ -101,7 +80,10 @@ export default function VideoPlayer({ videoUrl, onVideoChange }) {
   return (
     <div className="relative w-full h-full bg-slate-900 overflow-hidden">
       {/* Video or Fallback */}
-      <div className="w-full h-full">
+      <div
+        className="w-full h-full"
+        onContextMenu={(e) => e.preventDefault()} // ✅ Prevent long-press menu
+      >
         {finalVideoId ? (
           <YouTube
             videoId={finalVideoId}
@@ -121,8 +103,8 @@ export default function VideoPlayer({ videoUrl, onVideoChange }) {
               }
             }}
             onReady={(event) => {
-              event.target.mute(); // ✅ Mute to allow autoplay
-              event.target.playVideo(); // ✅ Explicitly play
+              event.target.mute();
+              event.target.playVideo();
             }}
           />
         ) : (
@@ -133,13 +115,12 @@ export default function VideoPlayer({ videoUrl, onVideoChange }) {
         )}
       </div>
 
-      {/* Settings Buttons */}
+      {/* Settings Button */}
       <div className="absolute top-4 right-4 z-50">
         <Button onClick={() => setShowSettings(true)} className="bg-white/20 text-white">
           <Settings className="w-5 h-5" />
         </Button>
       </div>
-
 
       {/* Settings Panel */}
       {showSettings && (
@@ -154,7 +135,6 @@ export default function VideoPlayer({ videoUrl, onVideoChange }) {
           applyPreset={applyPreset}
         />
       )}
-
     </div>
   );
 }
