@@ -131,7 +131,7 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
             <div className="bg-slate-100 rounded-2xl rounded-bl-md px-4 py-3 max-w-xs">
               <div className="flex items-center gap-2 text-slate-600">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-sm">SmartChat is processing your request...</span>
+                  <span className="text-sm">CorningChat is processing your request...</span>
               </div>
             </div>
           </motion.div>

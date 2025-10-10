@@ -72,14 +72,13 @@ export default function SettingsPanel({
         <div className="space-y-2">
           <label className="text-sm font-medium">YouTube URL</label>
           <div className="flex gap-2">
-<Input
-  placeholder="Paste YouTube URL..."
-  value={tempUrl}
-  onChange={(e) => setTempUrl(e.target.value)}
-  onKeyPress={(e) => e.key === "Enter" && handleUrlSubmit()}
-  className="w-full text-black bg-white"
-  style={{ color: "#000", backgroundColor: "#fff" }}
-/>
+            <Input
+              placeholder="Paste YouTube URL..."
+              value={tempUrl}
+              onChange={(e) => setTempUrl(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleUrlSubmit()}
+              className="w-full text-white bg-slate-700 placeholder-slate-400"
+            />
 
             <Button
               onClick={handleUrlSubmit}
