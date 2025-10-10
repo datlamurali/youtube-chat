@@ -120,8 +120,11 @@ export default function VideoPlayer({ videoUrl, onVideoChange }) {
                 iv_load_policy: 3
               }
             }}
+            onReady={(event) => {
+              event.target.mute(); // ✅ Mute to allow autoplay
+              event.target.playVideo(); // ✅ Explicitly play
+            }}
           />
-
         ) : (
           <div className="flex items-center justify-center w-full h-full text-white">
             <Play className="w-16 h-16 opacity-50" />
