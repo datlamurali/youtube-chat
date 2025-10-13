@@ -23,7 +23,6 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
     scrollToBottom();
   }, [messages]);
 
-  // ✅ Updated to accept optional overrideText
   const handleSend = async (overrideText) => {
     const message = overrideText ?? inputText.trim();
     if (!message || isLoading) return;
@@ -53,7 +52,6 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
     }
   };
 
-    // ✅ Updated to pass transcript directly to handleSend
   const handleVoiceInput = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -73,7 +71,6 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
       setInputText(transcript);
       setIsMicActive(false);
 
-      // ✅ Delay sending by 5 seconds
       setTimeout(() => {
         handleSend(transcript);
       }, 2500);
@@ -84,8 +81,6 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
 
     recognition.start();
   };
-
-
 
   const safeColor = {
     border: textboxColor?.border || "#FFFFFF",
@@ -102,7 +97,7 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
           onClick={onClose}
           className="text-white hover:text-red-400 p-3 rounded-full border border-white/20 shadow-md backdrop-blur-sm"
         >
-          <XCircle className="w-6 h-6" />
+          <XCircle className="w-8 h-8" />
         </Button>
 
         <Button
@@ -112,12 +107,12 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
           } text-white`}
           title="Voice Input"
         >
-          <Mic className="w-6 h-6" />
+          <Mic className="w-8 h-8" />
         </Button>
       </div>
 
       {/* Chat History */}
-      <div className="flex-1 overflow-y-auto px-4 pt-8 pb-2 space-y-3">
+<div className="flex-1 overflow-y-auto pt-24 pb-2 pr-20 pl-4 space-y-3 w-full">
         {messages.map((message) => (
           <MessageBubble key={message.id} message={message} />
         ))}
@@ -128,10 +123,10 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
             animate={{ opacity: 1, scale: 1 }}
             className="flex justify-start"
           >
-            <div className="bg-slate-100 rounded-2xl rounded-bl-md px-4 py-3 max-w-xs">
+            <div className="bg-slate-100 rounded-2xl rounded-bl-md px-4 py-3 w-full max-w-full">
               <div className="flex items-center gap-2 text-slate-600">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-sm">CorningChat is processing your request...</span>
+                <span className="text-sm">CorningChat is processing your request...</span>
               </div>
             </div>
           </motion.div>
@@ -140,8 +135,8 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
       </div>
 
       {/* Input Area */}
-      <div className="bg-slate-950 p-4 z-40">
-        <div className="flex gap-3 items-end w-full max-w-full box-border">
+      <div className="bg-slate-950 p-4 z-40 w-full">
+        <div className="flex gap-3 items-end w-full box-border">
           <motion.div layout className="flex-1">
             <Input
               ref={inputRef}
@@ -154,7 +149,7 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
                 backgroundColor: safeColor.background,
                 color: safeColor.font
               }}
-              className={`px-4 py-3 text-base h-12 w-full rounded-2xl resize-none focus:outline-none placeholder-opacity-100`}
+              className="px-4 py-3 text-base h-12 w-full rounded-2xl resize-none focus:outline-none placeholder-opacity-100"
               disabled={isLoading}
             />
           </motion.div>
