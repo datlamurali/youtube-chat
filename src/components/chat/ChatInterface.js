@@ -119,18 +119,29 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
 
         {isLoading && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             className="flex justify-start"
           >
-            <div className="bg-slate-100 rounded-2xl rounded-bl-md px-4 py-3 w-full max-w-full">
-              <div className="flex items-center gap-2 text-slate-600">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-sm">CorningChat is processing your request...</span>
+            <div className="relative bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-300 rounded-2xl rounded-bl-md px-4 py-3 w-full max-w-full shadow-sm">
+              <div className="flex items-center gap-4 text-slate-600">
+                <img
+                  src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2JmbDl2bW5zMGFhdXloaGFobHA1eHc5YjBiYThpM2g5b3R6bHU5MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/fDkq28pQkslOfCrMiO/giphy.gif"
+                  alt="Loading animation"
+                  className="w-10 h-10 rounded-full"
+                />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">CorningChat is warming up…</span>
+                  <span className="text-xs text-slate-500">Just a moment while we get things rolling 🛠️</span>
+                </div>
               </div>
             </div>
           </motion.div>
         )}
+
+
+
         <div ref={messagesEndRef} />
       </div>
 

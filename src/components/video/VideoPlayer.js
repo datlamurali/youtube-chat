@@ -5,7 +5,7 @@ import { Play, Settings } from "lucide-react";
 import { useGlobalSettings } from "../../contexts/GlobalSettingsContext";
 import SettingsPanel from "../ui/SettingsPanel";
 
-export default function VideoPlayer({ videoUrl, onVideoChange }) {
+export default function VideoPlayer({ videoUrl, onVideoChange, onPlay }) {
   const [showSettings, setShowSettings] = useState(false);
   const [tempUrl, setTempUrl] = useState("");
   const [previewInChat, setPreviewInChat] = useState(false);
@@ -103,6 +103,10 @@ export default function VideoPlayer({ videoUrl, onVideoChange }) {
               onReady={(event) => {
                 event.target.mute();
                 event.target.playVideo();
+                if (typeof onPlay === "function") {
+                  console.log("▶️ Video is playing — triggering voice activation");
+                  onPlay(); // ✅ Trigger voice activation
+                }
               }}
             />
             {/* Transparent overlay to suppress long-press */}
