@@ -16,6 +16,7 @@ export default function useSpeechRecognizer({
   const isListeningRef = useRef(false);
   const restartAttempts = useRef(0);
   const isRetrying = useRef(false);
+  const shouldRestart = useRef(true); // ✅ new flag
 
   const startListening = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -30,6 +31,7 @@ export default function useSpeechRecognizer({
     }
 
     if (!isRetrying.current) restartAttempts.current = 0;
+    shouldRestart.current = true; // ✅ reset before each start
 
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
@@ -56,6 +58,7 @@ export default function useSpeechRecognizer({
         if (wakeWords.some((word) => transcript.includes(word))) {
           console.log(`✅ Wake word detected`);
           clearTimeout(silenceTimerRef.current);
+          shouldRestart.current = false; // ✅ prevent restart
           recognition.stop();
           onWakeWord();
           return;
@@ -64,6 +67,7 @@ export default function useSpeechRecognizer({
         if (closeWords.some((word) => transcript.includes(word))) {
           console.log(`❎ Close word detected`);
           clearTimeout(silenceTimerRef.current);
+          shouldRestart.current = false; // ✅ prevent restart
           recognition.stop();
           if (typeof onCloseChat === "function") onCloseChat();
           return;
@@ -72,6 +76,7 @@ export default function useSpeechRecognizer({
         if (isChatOpen) {
           console.log("💬 Voice input detected during chat");
           clearTimeout(silenceTimerRef.current);
+          shouldRestart.current = false; // ✅ prevent restart
           recognition.stop();
           onVoiceInput(transcript);
           return;
@@ -86,14 +91,14 @@ export default function useSpeechRecognizer({
       recognitionRef.current = null;
       console.log("🛑 Recognition ended");
 
-      if (restartAttempts.current < maxRestarts) {
+      if (shouldRestart.current && restartAttempts.current < maxRestarts) {
         restartAttempts.current += 1;
         isRetrying.current = true;
         console.log(`🔁 Restarting recognition (attempt ${restartAttempts.current})`);
         setTimeout(() => startListening(), 500);
       } else {
         isRetrying.current = false;
-        console.log("❌ Max restart attempts reached — giving up");
+        console.log("❌ Max restart attempts reached or restart disabled");
       }
     };
 

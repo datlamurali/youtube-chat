@@ -2,20 +2,68 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 const GlobalSettingsContext = createContext();
 
-export const GlobalSettingsProvider = ({ children }) => {
-  const [aiPanelHeight, setAiPanelHeight] = useState("187.50px");
-  const [textboxColor, setTextboxColor] = useState({
-    border: "#FFFFFF",
-    background: "#000000",
+const defaultTextboxColor = {
+  name: "Classic Light",
+  border: "#CCCCCC",
+  background: "#FFFFFF",
+  font: "#333333"
+};
+
+const defaultAiPanelHeight = "245.9px";
+
+const defaultPresets = [
+  defaultTextboxColor,
+  {
+    name: "Midnight",
+    border: "#444444",
+    background: "#1A1A1A",
+    font: "#E0E0E0"
+  },
+  {
+    name: "Sea Shell",
+    border: "#fbe8ea",
+    background: "#fbe8ea",
+    font: "#000000"
+  },
+  {
+    name: "Dark Brown",
+    border: "#5b3d3b",
+    background: "#5b3d3b",
     font: "#FFFFFF"
-  });
+  },
+  {
+    name: "Licorce",
+    border: "#9c717f",
+    background: "#9c717f",
+    font: "#FFFFFF"
+  }
+];
+
+export function GlobalSettingsProvider({ children }) {
+  // Load persisted settings
+  const [aiPanelHeight, setAiPanelHeight] = useState(() =>
+    localStorage.getItem("aiPanelHeight") || defaultAiPanelHeight
+  );
+
+  const [textboxColor, setTextboxColor] = useState(() =>
+    JSON.parse(localStorage.getItem("textboxColor")) || defaultTextboxColor
+  );
+
   const [pendingColor, setPendingColor] = useState(textboxColor);
-  const [colorPresets, setColorPresets] = useState([]);
+  const [userPresets, setUserPresets] = useState([]);
+
+  const colorPresets = [...defaultPresets, ...userPresets];
   const [wakeWords, setWakeWords] = useState(["wake up"]);
   const [closeWords, setCloseWords] = useState(["close chat"]);
   const [maxRestartAttempts, setMaxRestartAttempts] = useState(3);
 
+  // Persist settings on change
   useEffect(() => {
+    localStorage.setItem("textboxColor", JSON.stringify(textboxColor));
+  }, [textboxColor]);
+
+  useEffect(() => {
+    localStorage.setItem("aiPanelHeight", aiPanelHeight);
     const storedWake = localStorage.getItem("wakeWords");
     const storedClose = localStorage.getItem("closeWords");
     const storedMax = localStorage.getItem("maxRestartAttempts");
@@ -23,24 +71,14 @@ export const GlobalSettingsProvider = ({ children }) => {
     if (storedWake) setWakeWords(JSON.parse(storedWake));
     if (storedClose) setCloseWords(JSON.parse(storedClose));
     if (storedMax) setMaxRestartAttempts(parseInt(storedMax));
-  }, []);
+  }, [aiPanelHeight]);
 
   const resetSettings = () => {
-    setAiPanelHeight("187.50px");
-    setTextboxColor({
-      border: "#FFFFFF",
-      background: "#000000",
-      font: "#FFFFFF"
-    });
-    setPendingColor({
-      border: "#FFFFFF",
-      background: "#000000",
-      font: "#FFFFFF"
-    });
-    setWakeWords(["wake up"]);
-    setCloseWords(["close chat"]);
-    setMaxRestartAttempts(3);
-    localStorage.clear();
+    setAiPanelHeight(defaultAiPanelHeight);
+    setTextboxColor(defaultTextboxColor);
+    setPendingColor(defaultTextboxColor);
+    localStorage.removeItem("textboxColor");
+    localStorage.removeItem("aiPanelHeight");
   };
 
   return (
@@ -53,7 +91,7 @@ export const GlobalSettingsProvider = ({ children }) => {
         pendingColor,
         setPendingColor,
         colorPresets,
-        setColorPresets,
+        setUserPresets,
         resetSettings,
         wakeWords,
         setWakeWords,
@@ -66,6 +104,6 @@ export const GlobalSettingsProvider = ({ children }) => {
       {children}
     </GlobalSettingsContext.Provider>
   );
-};
+}
 
 export const useGlobalSettings = () => useContext(GlobalSettingsContext);

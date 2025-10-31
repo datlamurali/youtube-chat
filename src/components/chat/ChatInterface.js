@@ -90,8 +90,9 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
 
   return (
     <div className="h-full w-full bg-black border-t border-slate-200/50 flex flex-col relative">
-      {/* Close + Mic Buttons */}
-      <div className="absolute top-2 right-4 z-50 flex flex-col items-center gap-3">
+      {/* Floating Button Stack */}
+      <div className="absolute top-4 right-4 z-50 flex flex-col items-center space-y-4">
+        {/* Close Button */}
         <Button
           variant="ghost"
           onClick={onClose}
@@ -100,6 +101,7 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
           <XCircle className="w-8 h-8" />
         </Button>
 
+        {/* Mic Button */}
         <Button
           onClick={handleVoiceInput}
           className={`p-3 rounded-full shadow-md ${
@@ -110,6 +112,7 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
           <Mic className="w-8 h-8" />
         </Button>
       </div>
+
 
       {/* Chat History */}
 <div className="flex-1 overflow-y-auto pt-24 pb-2 pr-20 pl-4 space-y-3 w-full">

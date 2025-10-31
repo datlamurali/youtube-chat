@@ -67,17 +67,29 @@ export default function VideoChat() {
     maxRestarts: maxRestartAttempts
   });
 
+
+
   useEffect(() => {
     const handleResize = () => setViewportHeight(window.innerHeight);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const panelHeight = aiPanelHeight || "187.50px";
+  const addMessage = (text, isAi = false) => {
+    const newMessage = {
+      id: Date.now(),
+      text,
+      isAi,
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, newMessage]);
+  };
+
+  const panelHeight = aiPanelHeight || "245.9px";
   const videoHeight = `${viewportHeight - parseFloat(panelHeight)}px`;
 
   return (
-    <div className="w-screen flex flex-col bg-black overflow-hidden relative" style={{ height: `${viewportHeight}px` }}>
+    <div className="w-screen flex flex-col bg-black overflow-hidden" style={{ height: `${viewportHeight}px` }}>
       {/* Listening Indicator */}
       {isListening && (
         <div className="absolute top-2 left-2 z-50 flex items-center gap-2 bg-neutral-900 text-white px-4 py-2 rounded-full shadow-md border border-white/10 backdrop-blur-sm animate-pulse">
@@ -98,9 +110,8 @@ export default function VideoChat() {
           <span className="text-sm font-medium tracking-wide">Listening…</span>
         </div>
       )}
-
-      {/* Video Player */}
-      <div style={{ height: videoHeight }} className="w-full">
+      {/* Video Player fills remaining space above chat */}
+      <div style={{ height: videoHeight }}>
         <VideoPlayer
           videoUrl={videoUrl}
           onVideoChange={setVideoUrl}
@@ -112,28 +123,18 @@ export default function VideoChat() {
       </div>
 
       {/* Bottom Panel — Tap to Open Chat */}
-      <div
-        className="relative w-full bg-black"
-        style={{ height: panelHeight }}
-        onClick={() => {
-          if (!chatVisible) {
-            console.log("👆 Tap detected on bottom panel — opening chat");
-            setChatVisible(true);
-          }
-        }}
-      >
-        {chatVisible && (
+      <div className="relative" style={{ height: panelHeight }}>
+        {!chatVisible ? (
+          <div
+            className="h-full w-full bg-black flex items-center justify-center text-white text-sm cursor-pointer"
+            onClick={() => setChatVisible(true)}
+          >
+            <span></span>
+          </div>
+        ) : (
           <ChatInterface
             messages={messages}
-            onSendMessage={(text, isAi) => {
-              const newMessage = {
-                id: Date.now(),
-                text,
-                isAi,
-                timestamp: new Date()
-              };
-              setMessages(prev => [...prev, newMessage]);
-            }}
+            onSendMessage={addMessage}
             onClose={() => setChatVisible(false)}
           />
         )}

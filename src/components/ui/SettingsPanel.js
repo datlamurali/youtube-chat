@@ -5,7 +5,7 @@ import { XCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useGlobalSettings } from "../../contexts/GlobalSettingsContext";
 import DropdownColorPicker from "./DropdownColorPicker";
-
+import { SketchPicker } from "react-color";
 export default function SettingsPanel({
   onClose,
   tempUrl,
@@ -34,7 +34,7 @@ export default function SettingsPanel({
     setMaxRestartAttempts
   } = useGlobalSettings();
 
-  const panelHeight = aiPanelHeight || "187.50px";
+  const panelHeight = aiPanelHeight || "245.9px";
 
   const handleClickOutside = (e) => {
     if (settingsRef.current && !settingsRef.current.contains(e.target)) {
@@ -139,7 +139,7 @@ export default function SettingsPanel({
 
         {/* Max Restart Attempts */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Max Voice Restart Attempts</label>
+          <label className="text-sm font-medium">Max Voice Restart Attempts: </label>
           <Input
             type="number"
             min={0}
@@ -166,8 +166,8 @@ export default function SettingsPanel({
           <div className="flex gap-2 items-center">
             <input
               type="range"
-              min="125"
-              max="250"
+              min="220"
+              max="260"
               step="0.01"
               value={parseFloat(panelHeight)}
               onChange={(e) => setAiPanelHeight(`${e.target.value}px`)}

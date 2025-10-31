@@ -38,7 +38,7 @@ export default function VideoPlayer({ videoUrl, onVideoChange, onPlay }) {
   const videoId = extractVideoId(videoUrl);
   const fallbackId = "F0QyPFRKllQ";
   const finalVideoId = videoId || fallbackId;
-  const panelHeight = aiPanelHeight || "187.50px";
+  const panelHeight = aiPanelHeight || "245.9px";
 
   const handleUrlSubmit = () => {
     if (tempUrl.trim()) {
