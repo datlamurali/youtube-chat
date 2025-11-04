@@ -28,7 +28,7 @@ export default function VideoChat() {
     maxRestartAttempts
   } = useGlobalSettings();
 
-  const { startListening } = useSpeechRecognizer({
+  const { startListening, stopListening } = useSpeechRecognizer({
     onWakeWord: () => {
       console.log("✅ Wake word detected — opening chat");
       setChatVisible(true);
@@ -55,6 +55,16 @@ export default function VideoChat() {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiMessage]);
+      // ✅ Restart speech recognition after response Delay restart slightly
+      setTimeout(() => {
+        console.log("🔄 Restarting recognition after AI response");
+        startListening();
+      }, 1000);
+
+      useEffect(() => {
+        console.log("🔍 isListening changed:", isListening);
+      }, [isListening]);
+
     },
     onCloseChat: () => {
       console.log("❎ Close word detected — closing chat");
@@ -66,8 +76,6 @@ export default function VideoChat() {
     closeWords,
     maxRestarts: maxRestartAttempts
   });
-
-
 
   useEffect(() => {
     const handleResize = () => setViewportHeight(window.innerHeight);
@@ -135,8 +143,13 @@ export default function VideoChat() {
           <ChatInterface
             messages={messages}
             onSendMessage={addMessage}
-            onClose={() => setChatVisible(false)}
+            onClose={() => {
+              setChatVisible(false);
+              setMicEnabled(false);
+            }}
+            stopListening={stopListening}
           />
+
         )}
       </div>
     </div>

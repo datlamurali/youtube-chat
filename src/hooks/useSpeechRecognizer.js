@@ -16,22 +16,34 @@ export default function useSpeechRecognizer({
   const isListeningRef = useRef(false);
   const restartAttempts = useRef(0);
   const isRetrying = useRef(false);
-  const shouldRestart = useRef(true); // ✅ new flag
+  const shouldRestart = useRef(true);
 
   const startListening = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      console.warn("SpeechRecognition not supported.");
+      console.warn("🚫 SpeechRecognition not supported in this browser.");
       return;
     }
 
+    // ✅ Clean up any stale recognizer before starting
     if (recognitionRef.current) {
-      console.log("⛔ Already listening — aborting start");
-      return;
+      console.log("🧹 Cleaning up stale recognition before restart");
+      try {
+        recognitionRef.current.onstart = null;
+        recognitionRef.current.onresult = null;
+        recognitionRef.current.onend = null;
+        recognitionRef.current.onerror = null;
+        recognitionRef.current.stop();
+      } catch (err) {
+        console.warn("⚠️ Error stopping stale recognition:", err.message);
+      }
+      recognitionRef.current = null;
     }
 
-    if (!isRetrying.current) restartAttempts.current = 0;
-    shouldRestart.current = true; // ✅ reset before each start
+    // ✅ Reset restart logic
+    shouldRestart.current = true;
+    restartAttempts.current = 0;
+    isRetrying.current = false;
 
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
@@ -42,10 +54,10 @@ export default function useSpeechRecognizer({
     recognition.onstart = () => {
       isListeningRef.current = true;
       setIsListening(true);
-      console.log("🎙️ Recognition started — waiting for wake word");
+      console.log("🎙️ Recognition started — waiting for wake word or input");
 
       silenceTimerRef.current = setTimeout(() => {
-        console.log(`⏱️ Wake word not detected in ${timeoutMs / 1000}s — stopping`);
+        console.log(`⏱️ Timeout: No input detected in ${timeoutMs / 1000}s — stopping`);
         recognition.stop();
       }, timeoutMs);
     };
@@ -56,17 +68,16 @@ export default function useSpeechRecognizer({
         console.log("🗣️ Heard:", transcript);
 
         if (wakeWords.some((word) => transcript.includes(word))) {
-          console.log(`✅ Wake word detected`);
+          console.log("✅ Wake word detected");
           clearTimeout(silenceTimerRef.current);
-          shouldRestart.current = true; // ✅ allow restart
-          onWakeWord(); // ✅ open chat
-          return; // ✅ keep listening
+          onWakeWord();
+          return;
         }
 
         if (closeWords.some((word) => transcript.includes(word))) {
-          console.log(`❎ Close word detected`);
+          console.log("❎ Close word detected");
           clearTimeout(silenceTimerRef.current);
-          shouldRestart.current = false; // ✅ stop after close
+          shouldRestart.current = false;
           recognition.stop();
           if (typeof onCloseChat === "function") onCloseChat();
           return;
@@ -75,7 +86,7 @@ export default function useSpeechRecognizer({
         if (isChatOpen) {
           console.log("💬 Voice input detected during chat");
           clearTimeout(silenceTimerRef.current);
-          shouldRestart.current = false; // ✅ stop after input
+          shouldRestart.current = false;
           recognition.stop();
           onVoiceInput(transcript);
           return;
@@ -102,7 +113,7 @@ export default function useSpeechRecognizer({
     };
 
     recognition.onerror = (e) => {
-      console.warn("Speech recognition error:", e.error);
+      console.warn("⚠️ Speech recognition error:", e.error);
       if (e.error === "no-speech") recognition.stop();
     };
 
@@ -110,9 +121,23 @@ export default function useSpeechRecognizer({
       recognition.start();
       console.log("🚀 recognition.start() called");
     } catch (err) {
-      console.warn("Start error:", err.message);
+      console.warn("❌ Error starting recognition:", err.message);
     }
   };
 
-  return { startListening };
+
+
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      console.log("🛑 Manually stopping recognition");
+      shouldRestart.current = false; // Prevent auto-restart
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+      clearTimeout(silenceTimerRef.current);
+      isListeningRef.current = false;
+      setIsListening(false);
+    }
+  };
+
+  return { startListening, stopListening };
 }

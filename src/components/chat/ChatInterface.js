@@ -7,7 +7,7 @@ import MessageBubble from "./MessageBubble";
 import { motion } from "framer-motion";
 import { useGlobalSettings } from "../../contexts/GlobalSettingsContext";
 
-export default function ChatInterface({ messages, onSendMessage, onClose }) {
+export default function ChatInterface({ messages, onSendMessage, onClose, stopListening }) {
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isMicActive, setIsMicActive] = useState(false);
@@ -53,6 +53,8 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
   };
 
   const handleVoiceInput = () => {
+    stopListening?.(); // ✅ Stop any ongoing recognition
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert("Speech recognition is not supported in this browser.");
@@ -81,6 +83,7 @@ export default function ChatInterface({ messages, onSendMessage, onClose }) {
 
     recognition.start();
   };
+
 
   const safeColor = {
     border: textboxColor?.border || "#FFFFFF",
