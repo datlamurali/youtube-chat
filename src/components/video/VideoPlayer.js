@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import YouTube from "react-youtube";
 import { Button } from "../ui/button";
-import { Play, Settings } from "lucide-react";
+import { Play, Settings, RotateCcw } from "lucide-react";
 import { useGlobalSettings } from "../../contexts/GlobalSettingsContext";
 import SettingsPanel from "../ui/SettingsPanel";
 
@@ -125,8 +125,22 @@ export default function VideoPlayer({ videoUrl, onVideoChange, onPlay }) {
       </div>
 
       {/* Settings Button */}
-      <div className="absolute top-4 right-4 z-50">
-        <Button onClick={() => setShowSettings(true)} className="bg-white/20 text-white">
+      <div className="absolute top-4 right-4 z-50 flex gap-2">
+        {/* Refresh Button */}
+        <Button
+          onClick={() => window.location.reload()}
+          className="bg-white/20 text-white"
+          title="Refresh Page"
+        >
+          <RotateCcw className="w-5 h-5" />
+        </Button>
+
+        {/* Settings Button */}
+        <Button
+          onClick={() => setShowSettings(true)}
+          className="bg-white/20 text-white"
+          title="Settings"
+        >
           <Settings className="w-5 h-5" />
         </Button>
       </div>

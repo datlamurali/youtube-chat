@@ -58,16 +58,15 @@ export default function useSpeechRecognizer({
         if (wakeWords.some((word) => transcript.includes(word))) {
           console.log(`✅ Wake word detected`);
           clearTimeout(silenceTimerRef.current);
-          shouldRestart.current = false; // ✅ prevent restart
-          recognition.stop();
-          onWakeWord();
-          return;
+          shouldRestart.current = true; // ✅ allow restart
+          onWakeWord(); // ✅ open chat
+          return; // ✅ keep listening
         }
 
         if (closeWords.some((word) => transcript.includes(word))) {
           console.log(`❎ Close word detected`);
           clearTimeout(silenceTimerRef.current);
-          shouldRestart.current = false; // ✅ prevent restart
+          shouldRestart.current = false; // ✅ stop after close
           recognition.stop();
           if (typeof onCloseChat === "function") onCloseChat();
           return;
@@ -76,7 +75,7 @@ export default function useSpeechRecognizer({
         if (isChatOpen) {
           console.log("💬 Voice input detected during chat");
           clearTimeout(silenceTimerRef.current);
-          shouldRestart.current = false; // ✅ prevent restart
+          shouldRestart.current = false; // ✅ stop after input
           recognition.stop();
           onVoiceInput(transcript);
           return;
