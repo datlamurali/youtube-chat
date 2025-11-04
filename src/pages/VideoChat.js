@@ -20,6 +20,7 @@ export default function VideoChat() {
   const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
   const [showToast, setShowToast] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [micEnabled, setMicEnabled] = useState(false);
 
   const {
     aiPanelHeight,
@@ -140,15 +141,16 @@ export default function VideoChat() {
             <span></span>
           </div>
         ) : (
-          <ChatInterface
-            messages={messages}
-            onSendMessage={addMessage}
-            onClose={() => {
-              setChatVisible(false);
-              setMicEnabled(false);
-            }}
-            stopListening={stopListening}
-          />
+            <ChatInterface
+              messages={messages}
+              onSendMessage={addMessage}
+              onClose={() => {
+                setChatVisible(false);
+                setMicEnabled(false); // ✅ Now this works
+              }}
+              micEnabled={micEnabled}
+              stopListening={stopListening}
+            />
 
         )}
       </div>
