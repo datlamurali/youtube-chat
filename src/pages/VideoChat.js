@@ -18,7 +18,6 @@ export default function VideoChat() {
   const [videoUrl, setVideoUrl] = useState("https://youtu.be/F0QyPFRKllQ");
   const [chatVisible, setChatVisible] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
-  const [showToast, setShowToast] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [micEnabled, setMicEnabled] = useState(false);
   const [micActive, setMicActive] = useState(false);
@@ -53,8 +52,6 @@ export default function VideoChat() {
     onWakeWord: () => {
       console.log("✅ Wake word detected — opening chat");
       setChatVisible(true);
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
     },
     onVoiceInput: async (transcript) => {
       const userMessage = {
@@ -134,11 +131,6 @@ export default function VideoChat() {
             />
           </svg>
           <span className="text-sm font-medium tracking-wide">Listening…</span>
-        </div>
-      )}
-      {showToast && (
-        <div className="absolute top-16 left-1/2 transform -translate-x-1/2 z-50 bg-blue-600 text-white px-4 py-2 rounded shadow-md text-sm font-medium">
-          🔊 Voice listening resumed…
         </div>
       )}
 
