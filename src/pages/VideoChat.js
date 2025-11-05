@@ -21,6 +21,7 @@ export default function VideoChat() {
   const [showToast, setShowToast] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [micEnabled, setMicEnabled] = useState(false);
+  const [micActive, setMicActive] = useState(false);
 
   const {
     aiPanelHeight,
@@ -28,6 +29,25 @@ export default function VideoChat() {
     closeWords,
     maxRestartAttempts
   } = useGlobalSettings();
+
+  useEffect(() => {
+    console.log("🔍 isListening changed:", isListening);
+  }, [isListening]);
+  
+  useEffect(() => {
+    if (micActive) {
+      stopListening(true);
+    } else{
+      setTimeout(() => {
+        console.log("🔄 Restarting recognition after AI response");
+        if (!isListening) {
+          startListening();
+        }
+      }, 8000);
+    }
+  }, [micActive]);
+
+
 
   const { startListening, stopListening } = useSpeechRecognizer({
     onWakeWord: () => {
@@ -44,7 +64,7 @@ export default function VideoChat() {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, userMessage]);
-
+      setMicActive(false); // ✅ allow recognition to resume
       const response = await InvokeLLM({
         prompt: `You are ChatGPT, an AI developed by OpenAI. You're engaging in a friendly and insightful conversation with a user who is watching a YouTube video. The context involves a professional and cordial dialogue between executives from Corning and Amazon. Keep your responses concise, engaging, and aligned with the tone of a thoughtful business exchange. User's message: "${transcript}"`
       });
@@ -56,15 +76,7 @@ export default function VideoChat() {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiMessage]);
-      // ✅ Restart speech recognition after response Delay restart slightly
-      setTimeout(() => {
-        console.log("🔄 Restarting recognition after AI response");
-        startListening();
-      }, 1000);
 
-      useEffect(() => {
-        console.log("🔍 isListening changed:", isListening);
-      }, [isListening]);
 
     },
     onCloseChat: () => {
@@ -75,7 +87,12 @@ export default function VideoChat() {
     setIsListening,
     wakeWords,
     closeWords,
-    maxRestarts: maxRestartAttempts
+    maxRestarts: maxRestartAttempts,
+    micActive,
+    onResumeListening: () => {
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    }
   });
 
   useEffect(() => {
@@ -119,6 +136,12 @@ export default function VideoChat() {
           <span className="text-sm font-medium tracking-wide">Listening…</span>
         </div>
       )}
+      {showToast && (
+        <div className="absolute top-16 left-1/2 transform -translate-x-1/2 z-50 bg-blue-600 text-white px-4 py-2 rounded shadow-md text-sm font-medium">
+          🔊 Voice listening resumed…
+        </div>
+      )}
+
       {/* Video Player fills remaining space above chat */}
       <div style={{ height: videoHeight }}>
         <VideoPlayer
@@ -141,17 +164,16 @@ export default function VideoChat() {
             <span></span>
           </div>
         ) : (
-            <ChatInterface
-              messages={messages}
-              onSendMessage={addMessage}
-              onClose={() => {
-                setChatVisible(false);
-                setMicEnabled(false); // ✅ Now this works
-              }}
-              micEnabled={micEnabled}
-              stopListening={stopListening}
-            />
-
+              <ChatInterface
+                messages={messages}
+                onSendMessage={addMessage}
+                onClose={() => {
+                  setChatVisible(false);
+                  setMicActive(false);
+                }}
+                stopListening={stopListening}
+                setMicActive={setMicActive}
+              />
         )}
       </div>
     </div>

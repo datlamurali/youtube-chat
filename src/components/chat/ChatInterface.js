@@ -7,7 +7,7 @@ import MessageBubble from "./MessageBubble";
 import { motion } from "framer-motion";
 import { useGlobalSettings } from "../../contexts/GlobalSettingsContext";
 
-export default function ChatInterface({ messages, onSendMessage, onClose, stopListening }) {
+export default function ChatInterface({ messages, onSendMessage, onClose, stopListening, setMicActive }) {
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isMicActive, setIsMicActive] = useState(false);
@@ -53,15 +53,16 @@ export default function ChatInterface({ messages, onSendMessage, onClose, stopLi
   };
 
   const handleVoiceInput = () => {
-    stopListening?.(); // ✅ Stop any ongoing recognition
+  stopListening?.(true); // ✅ Stop and prevent auto-restart
+  setMicActive(true);    // ✅ Block wake word listener
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert("Speech recognition is not supported in this browser.");
-      return;
-    }
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert("Speech recognition is not supported in this browser.");
+    return;
+  }
 
-    const recognition = new SpeechRecognition();
+  const recognition = new SpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.lang = "en-US";
@@ -72,18 +73,25 @@ export default function ChatInterface({ messages, onSendMessage, onClose, stopLi
       const transcript = event.results[0][0].transcript;
       setInputText(transcript);
       setIsMicActive(false);
+      setMicActive(false); // ✅ Allow wake word listener to resume
 
       setTimeout(() => {
         handleSend(transcript);
       }, 2500);
     };
 
-    recognition.onerror = () => setIsMicActive(false);
-    recognition.onend = () => setIsMicActive(false);
+    recognition.onerror = () => {
+      setIsMicActive(false);
+      setMicActive(false); // ✅ Resume wake word listener
+    };
+
+    recognition.onend = () => {
+      setIsMicActive(false);
+      setMicActive(false); // ✅ Resume wake word listener
+    };
 
     recognition.start();
   };
-
 
   const safeColor = {
     border: textboxColor?.border || "#FFFFFF",
@@ -118,7 +126,7 @@ export default function ChatInterface({ messages, onSendMessage, onClose, stopLi
 
 
       {/* Chat History */}
-<div className="flex-1 overflow-y-auto pt-24 pb-2 pr-20 pl-4 space-y-3 w-full">
+      <div className="flex-1 overflow-y-auto pt-24 pb-2 pr-20 pl-4 space-y-3 w-full">
         {messages.map((message) => (
           <MessageBubble key={message.id} message={message} />
         ))}

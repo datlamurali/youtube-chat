@@ -9,7 +9,9 @@ export default function useSpeechRecognizer({
   closeWords = ["close chat"],
   onCloseChat,
   timeoutMs = 60000,
-  maxRestarts = 3
+  maxRestarts = 3,
+  micActive,
+  onResumeListening // ✅ callback for toast
 }) {
   const recognitionRef = useRef(null);
   const silenceTimerRef = useRef(null);
@@ -19,13 +21,22 @@ export default function useSpeechRecognizer({
   const shouldRestart = useRef(true);
 
   const startListening = () => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      console.warn("🚫 SpeechRecognition not supported in this browser.");
+    if (micActive) {
+      console.log("🎤 Mic is active — skipping wake word listener");
       return;
     }
 
-    // ✅ Clean up any stale recognizer before starting
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      console.warn("🚫 SpeechRecognition not supported.");
+      return;
+    }
+
+    // ✅ Reset restart logic BEFORE creating recognizer
+    shouldRestart.current = true;
+    restartAttempts.current = 0;
+    isRetrying.current = false;
+
     if (recognitionRef.current) {
       console.log("🧹 Cleaning up stale recognition before restart");
       try {
@@ -40,11 +51,6 @@ export default function useSpeechRecognizer({
       recognitionRef.current = null;
     }
 
-    // ✅ Reset restart logic
-    shouldRestart.current = true;
-    restartAttempts.current = 0;
-    isRetrying.current = false;
-
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = false;
@@ -55,6 +61,7 @@ export default function useSpeechRecognizer({
       isListeningRef.current = true;
       setIsListening(true);
       console.log("🎙️ Recognition started — waiting for wake word or input");
+      if (typeof onResumeListening === "function") onResumeListening();
 
       silenceTimerRef.current = setTimeout(() => {
         console.log(`⏱️ Timeout: No input detected in ${timeoutMs / 1000}s — stopping`);
@@ -77,20 +84,24 @@ export default function useSpeechRecognizer({
         if (closeWords.some((word) => transcript.includes(word))) {
           console.log("❎ Close word detected");
           clearTimeout(silenceTimerRef.current);
-          shouldRestart.current = false;
+
+          // ✅ Keep listening after closing chat
+          shouldRestart.current = true;
+
           recognition.stop();
           if (typeof onCloseChat === "function") onCloseChat();
           return;
         }
 
-        if (isChatOpen) {
-          console.log("💬 Voice input detected during chat");
+        if (micActive) {
+          console.log("🎤 Voice input triggered by mic");
           clearTimeout(silenceTimerRef.current);
           shouldRestart.current = false;
           recognition.stop();
           onVoiceInput(transcript);
           return;
         }
+
       }
     };
 
@@ -125,12 +136,14 @@ export default function useSpeechRecognizer({
     }
   };
 
-
-
-  const stopListening = () => {
+  const stopListening = (disableRestart = false) => {
     if (recognitionRef.current) {
       console.log("🛑 Manually stopping recognition");
-      shouldRestart.current = false; // Prevent auto-restart
+
+      if (disableRestart) {
+        shouldRestart.current = false; // ✅ Prevent auto-restart
+      }
+
       recognitionRef.current.stop();
       recognitionRef.current = null;
       clearTimeout(silenceTimerRef.current);
@@ -138,6 +151,8 @@ export default function useSpeechRecognizer({
       setIsListening(false);
     }
   };
+
+
 
   return { startListening, stopListening };
 }
