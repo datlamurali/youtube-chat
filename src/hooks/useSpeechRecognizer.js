@@ -8,7 +8,7 @@ export default function useSpeechRecognizer({
   wakeWords = ["wake up"],
   closeWords = ["close chat"],
   onCloseChat,
-  timeoutMs = 60000,
+  timeoutMs = 600000000,
   maxRestarts = 3,
   micActive,
   onResumeListening // ✅ callback for toast
