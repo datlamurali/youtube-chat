@@ -151,7 +151,7 @@ export default function ChatInterface({ messages, onSendMessage, onClose, stopLi
                 <img
                   src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2JmbDl2bW5zMGFhdXloaGFobHA1eHc5YjBiYThpM2g5b3R6bHU5MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/fDkq28pQkslOfCrMiO/giphy.gif"
                   alt="Loading animation"
-                  className="w-10 h-10 rounded-full"
+                  className="w-16 h-16 rounded-full"
                 />
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">CorningChat is warming up…</span>
