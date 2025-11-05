@@ -27,6 +27,7 @@ export default function ChatInterface({ messages, onSendMessage, onClose, stopLi
     const message = overrideText ?? inputText.trim();
     if (!message || isLoading) return;
 
+    console.log("🟡 Sending message:", message);
     setInputText("");
     onSendMessage(message, false);
     setIsLoading(true);
@@ -36,14 +37,21 @@ export default function ChatInterface({ messages, onSendMessage, onClose, stopLi
         prompt: `You are ChatGPT, a large language model by OpenAI. You are having a friendly and helpful conversation with a user who is watching a YouTube video. Keep your responses concise and engaging. User's message: "${message}"`
       });
 
+      console.log("🟢 AI response received:", response);
       onSendMessage(response, true);
+
+      // ✅ Restart wake word listener here
+      console.log("🔄 Restarting wake word listener after AI response");
+      setMicActive(false); // This will trigger the effect in VideoChat to resume listening
     } catch (error) {
+      console.error("❌ Error from InvokeLLM:", error);
       onSendMessage("I'm sorry, I encountered an error. Please try again!", true);
     } finally {
       setIsLoading(false);
       inputRef.current?.focus();
     }
   };
+
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {

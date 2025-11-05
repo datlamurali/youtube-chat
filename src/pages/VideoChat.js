@@ -36,13 +36,8 @@ export default function VideoChat() {
   useEffect(() => {
     if (micActive) {
       stopListening(true);
-    } else{
-      setTimeout(() => {
-        console.log("🔄 Restarting recognition after AI response");
-        if (!isListening) {
-          startListening();
-        }
-      }, 8000);
+    } else {
+      startListening();
     }
   }, [micActive]);
 
@@ -53,29 +48,6 @@ export default function VideoChat() {
       console.log("✅ Wake word detected — opening chat");
       setChatVisible(true);
     },
-    onVoiceInput: async (transcript) => {
-      const userMessage = {
-        id: Date.now(),
-        text: transcript,
-        isAi: false,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, userMessage]);
-      setMicActive(false); // ✅ allow recognition to resume
-      const response = await InvokeLLM({
-        prompt: `You are ChatGPT, an AI developed by OpenAI. You're engaging in a friendly and insightful conversation with a user who is watching a YouTube video. The context involves a professional and cordial dialogue between executives from Corning and Amazon. Keep your responses concise, engaging, and aligned with the tone of a thoughtful business exchange. User's message: "${transcript}"`
-      });
-
-      const aiMessage = {
-        id: Date.now() + 1,
-        text: response,
-        isAi: true,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, aiMessage]);
-
-
-    },
     onCloseChat: () => {
       console.log("❎ Close word detected — closing chat");
       setChatVisible(false);
@@ -85,11 +57,7 @@ export default function VideoChat() {
     wakeWords,
     closeWords,
     maxRestarts: maxRestartAttempts,
-    micActive,
-    onResumeListening: () => {
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
-    }
+    micActive
   });
 
   useEffect(() => {
